@@ -1,2 +1,3 @@
 .ssh/
-*.pem echo data
+*.pem 
+data
