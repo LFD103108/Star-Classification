@@ -10,6 +10,7 @@ Purpose:
 # =============================================================================
 import pandas as pd
 from pathlib import Path
+from astropy.time import Time
 
 # =============================================================================
 # Path Configuration
@@ -25,27 +26,25 @@ gold_path.mkdir(parents=True, exist_ok=True)
 # Load silver data
 dfG = pd.read_csv(silver_path)
 
-# Convert timestamp
-dfG['date'] = pd.to_datetime(dfG['date'], unit='s')
+# Filter columns
+keep_columns = [
+     'observation_date' ,'observation_id', 'full_class',
+     'effective_temperature', 'log_surface_gravity','metallicity_fe_h', 
+     'radial_velocity', 'redshift' 
+      #'magnitude_type', 'magnitude_u', 'magnitude_g',
+      # 'magnitude_r', 'magnitude_i', 'magnitude_z', 'magnitude_j',
+      #'magnitude_h'
+ ]
+dfG = dfG[keep_columns]
 
-# Split spectral classes
-dfG[['class', 'subclass', 'luminosity_class']] = dfG['full_class'].str.extract(r'^([A-Za-z]+)(\d+)?([IV]+)?$')
-dfG['subclass'] = [str(dfG['class'][j])+ str(dfG['subclass'][j]) for j in range(len(dfG))]
-dfG['luminosity_class'] = dfG['luminosity_class'].fillna('')
+# Formating 'observation_date' from JD to datetime
+dfG['observation_date'] = Time(dfG['observation_date'].values, format='jd').to_datetime() # converts to to datetime
+dfG['observation_date'] = dfG['observation_date'].dt.strftime('%Y/%m/%d')                 # rewrites datetime as "YYYY/MM/DD"
 
-# Create composite key
-dfG['identifier'] = dfG['date'].dt.strftime('%Y%m%d') + '_' + dfG['lamost'].astype(str)
-
-# =============================================================================
-# Column Reordering
-# =============================================================================
-other_columns = [col for col in dfG.columns 
-                if col not in ['identifier', 'class', 'subclass', 
-                              'luminosity_class', 'full_class', 'lamost', 'date']]
-
-dfG = dfG[['identifier', 'class', 'subclass', 'luminosity_class', 'full_class'] + 
-          other_columns + 
-          ['lamost', 'date']]
+# Organizing the columns
+dfG.insert(0, 'identifier', dfG['observation_id'].astype(str) + '|' + dfG['observation_date']) # creates a composite hard key 'observation_id' + 'observation_date'
+dfG = dfG.drop(['observation_date','observation_id'], axis=1)                                  # drops the columns used to create the hard key
+dfG.insert(1, 'class', dfG['full_class'].str[0])                                               # inserts the 'class' column, useful for later training
 
 # =============================================================================
 # Data Export
