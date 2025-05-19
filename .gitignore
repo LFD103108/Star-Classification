@@ -1,3 +1,5 @@
 .ssh/
 *.pem
+.ipynb_checkpoints
+vizier_testing_V_156.ipynb
 /data/ 
