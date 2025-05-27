@@ -14,17 +14,18 @@ from pathlib import Path  # Cross-platform filesystem path handling
 # =============================================================================
 # Query Setup & Execution
 # =============================================================================
-CATALOGUE = "J/ApJS/266/14"  # Target VizieR catalog
+CATALOGUE = "V/156"  # Target VizieR catalog
 catalogue_ivoid = f"ivo://CDS.VizieR/{CATALOGUE}"  # Construct IVOA identifier
 
 # Fetch catalog metadata and table list
 voresource = registry.search(ivoid=catalogue_ivoid)[0]
 tables = voresource.get_tables()
-first_table_name = list(tables.keys())[0]  # Get first table name dynamically
+first_table_name = list(tables.keys())[1]  # Get first table name dynamically
 
 # Execute TAP query to extract ALL columns (no explicit column selection)
 tap_service = voresource.get_service("tap")
-tap_records = tap_service.search(f'SELECT * FROM "{first_table_name}"')
+#tap_records = tap_service.search(f'SELECT TOP 1000000* FROM "{first_table_name}"')
+tap_records = tap_service.search(f'SELECT TOP 50000* FROM "{first_table_name}"')
 
 # =============================================================================
 # Data Storage
