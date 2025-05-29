@@ -10,6 +10,7 @@ Purpose:
 # =============================================================================
 import pandas as pd
 from pathlib import Path
+from astropy.time import Time
 
 # =============================================================================
 # Load Bronze Data
@@ -84,6 +85,10 @@ dfS = dfB.rename(columns={
     'GaiaDR2': 'gaia_dr2_id',
     'Gmag': 'gaia_g_magnitude'
 })
+
+#Time stamping the observion_date
+dfS['observation_date'] = Time(dfS['observation_date'].values, format='jd').to_datetime()
+
 
 
 # =============================================================================
