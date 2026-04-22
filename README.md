@@ -1,4 +1,4 @@
-* Stellar Spectral Type Classification - Harvard Scheme
+# Stellar Spectral Type Classification - Harvard Scheme
 
 This project implements an automated classification system for stellar spectral types following the **Harvard Classification** scheme. The classification is performed **based on stellar effective temperature**, mapping temperature values to spectral classes and subclasses.
 
